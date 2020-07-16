@@ -1,0 +1,13 @@
+schema:
+    - "pkg/gql/schema.gql"
+exec:
+    filename: "pkg/gql/exec/tmp/generated.go"
+    package: gql
+model:
+    filename: "pkg/gql/models/tmp/generated.go"
+    package: models
+resolver:
+    filename: "pkg/gql/resolvers/tmp/generated.go"
+    type: Resolver
+    package: resolvers
+autobind: []

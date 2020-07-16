@@ -1,0 +1,27 @@
+type Product {
+    id:ID
+    title:String
+    price:Float
+    discount:Float
+    content:String
+    avator:String
+}
+
+input ProductInput {
+    title:String
+    price:Float
+    discount:Float
+    content:String
+    avator:String
+}
+
+type Mutation {
+    createproduct(input:ProductInput!):Product
+    updateproduct(input:ProductInput!,productId:ID!):Product
+    deleteproduct(productId:ID!):Boolean
+}
+
+type Query {
+    products:[Product]
+    productwithid(productId:ID!):Product
+}
