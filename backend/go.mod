@@ -7,7 +7,7 @@ require (
 	github.com/agnivade/levenshtein v1.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/gin-gonic/gin v1.6.3
-	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
+	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
