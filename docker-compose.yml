@@ -2,7 +2,7 @@ version: "3.7"
 services:
     db:
         build: "./db"
-        image: "michelo851a1203/db"
+        image: "michelo851a1203/testapp_db"
         restart: always
         ports:
             - "27017:27017"
@@ -15,14 +15,12 @@ services:
             - "mydbentry:/docker-entrypoint-initdb.d"
         networks:
             backendnetwork:
-        volumes:
-            dbvolume:
     backend:
         build:
-            context: "./backend"
-        image: "michelo851a1203/backend"
+            context: ./backend
+        image: "michelo851a1203/testapp_backend"
         ports:
-            - "8012:8080"
+            - "8017:8080"
         networks:
             backendnetwork:
     # forntend:
@@ -37,5 +35,5 @@ networks:
     backendnetwork: 
     frontnetwork: 
 volumes:
-    dbvolume:
-    mydbentry:
+    dbvolume: 
+    mydbentry: 
