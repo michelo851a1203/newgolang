@@ -3,30 +3,39 @@ services:
     db:
         build: "./db"
         image: "michelo851a1203/db"
+        restart: always
         ports:
             - "27017:27017"
+        environment: 
+            - "MONGO_INITDB_ROOT_USERNAME:root"
+            - "MONGO_INITDB_ROOT_PASSWORD:lneequal1"
+            - "MONGO_INITDB_DATABASE:shop"
+        volumes:
+            - "dbvolume:/data/db"
+            - "mydbentry:/docker-entrypoint-initdb.d"
         networks:
             backendnetwork:
-        volume:
+        volumes:
             dbvolume:
     backend:
         build:
             context: "./backend"
         image: "michelo851a1203/backend"
         ports:
-            - "8080:8080"
+            - "8012:8080"
         networks:
             backendnetwork:
-    forntend:
-        build:
-            context: "./frontend"
-        image: "michelo851a1203/frontend"
-        ports: 
-            - "8080:8080"
-        networks:
-            frontnetwork:
+    # forntend:
+    #     build:
+    #         context: "./frontend"
+    #     image: "michelo851a1203/frontend"
+    #     ports: 
+    #         - "8080:8080"
+    #     networks:
+    #         frontnetwork:
 networks:
     backendnetwork: 
     frontnetwork: 
 volumes:
     dbvolume:
+    mydbentry:
