@@ -3,6 +3,7 @@ type Product {
     title:String
     price:Float
     discount:Float
+    code:String
     content:String
     avator:String
 }
@@ -11,6 +12,7 @@ input ProductInput {
     title:String
     price:Float
     discount:Float
+    code:String
     content:String
     avator:String
 }

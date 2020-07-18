@@ -7,6 +7,7 @@ type Product struct {
 	Title    *string  `json:"title"`
 	Price    *float64 `json:"price"`
 	Discount *float64 `json:"discount"`
+	Code     *string  `json:"code"`
 	Content  *string  `json:"content"`
 	Avator   *string  `json:"avator"`
 }
@@ -15,6 +16,7 @@ type ProductInput struct {
 	Title    *string  `json:"title"`
 	Price    *float64 `json:"price"`
 	Discount *float64 `json:"discount"`
+	Code     *string  `json:"code"`
 	Content  *string  `json:"content"`
 	Avator   *string  `json:"avator"`
 }

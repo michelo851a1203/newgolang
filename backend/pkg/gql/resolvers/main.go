@@ -17,6 +17,7 @@ func (r *mutationResolver) Createproduct(ctx context.Context, input models.Produ
 		Title:    *input.Title,
 		Price:    *input.Price,
 		Discount: *input.Discount,
+		Code:     *input.Code,
 		Content:  *input.Content,
 	}
 
@@ -30,6 +31,7 @@ func (r *mutationResolver) Createproduct(ctx context.Context, input models.Produ
 		Title:    &result.Title,
 		Price:    &result.Price,
 		Discount: &result.Discount,
+		Code:     &result.Code,
 		Content:  &result.Content,
 	}
 	return &oData, nil
@@ -56,6 +58,7 @@ func (r *queryResolver) Products(ctx context.Context) ([]*models.Product, error)
 			ID:       &id,
 			Title:    &v.Title,
 			Price:    &v.Price,
+			Code:     &v.Code,
 			Discount: &v.Discount,
 			Content:  &v.Content,
 		}

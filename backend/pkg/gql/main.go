@@ -50,6 +50,7 @@ type ComplexityRoot struct {
 
 	Product struct {
 		Avator   func(childComplexity int) int
+		Code     func(childComplexity int) int
 		Content  func(childComplexity int) int
 		Discount func(childComplexity int) int
 		ID       func(childComplexity int) int
@@ -130,6 +131,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Product.Avator(childComplexity), true
+
+	case "Product.code":
+		if e.complexity.Product.Code == nil {
+			break
+		}
+
+		return e.complexity.Product.Code(childComplexity), true
 
 	case "Product.content":
 		if e.complexity.Product.Content == nil {
@@ -254,6 +262,7 @@ var sources = []*ast.Source{
     title:String
     price:Float
     discount:Float
+    code:String
     content:String
     avator:String
 }
@@ -262,6 +271,7 @@ input ProductInput {
     title:String
     price:Float
     discount:Float
+    code:String
     content:String
     avator:String
 }
@@ -633,6 +643,37 @@ func (ec *executionContext) _Product_discount(ctx context.Context, field graphql
 	res := resTmp.(*float64)
 	fc.Result = res
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Product_code(ctx context.Context, field graphql.CollectedField, obj *models.Product) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Product",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Product_content(ctx context.Context, field graphql.CollectedField, obj *models.Product) (ret graphql.Marshaler) {
@@ -1914,6 +1955,12 @@ func (ec *executionContext) unmarshalInputProductInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "code":
+			var err error
+			it.Code, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "content":
 			var err error
 			it.Content, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -1991,6 +2038,8 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Product_price(ctx, field, obj)
 		case "discount":
 			out.Values[i] = ec._Product_discount(ctx, field, obj)
+		case "code":
+			out.Values[i] = ec._Product_code(ctx, field, obj)
 		case "content":
 			out.Values[i] = ec._Product_content(ctx, field, obj)
 		case "avator":
