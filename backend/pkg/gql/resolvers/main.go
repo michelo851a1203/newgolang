@@ -4,7 +4,6 @@ package resolvers
 
 import (
 	"context"
-	db "testapp/pkg/db"
 	gql "testapp/pkg/gql"
 	models "testapp/pkg/gql/models"
 )
@@ -12,29 +11,36 @@ import (
 // Resolver <>
 type Resolver struct{}
 
+// TODO: this mongodb application cause error and stuck here if db not exist
+// okay we find the problem
+// TODO: docker-compose not show any !(okay find the probelm is the same as mongodb problem)
 func (r *mutationResolver) Createproduct(ctx context.Context, input models.ProductInput) (*models.Product, error) {
-	iData := db.Product{
-		Title:    *input.Title,
-		Price:    *input.Price,
-		Discount: *input.Discount,
-		Code:     *input.Code,
-		Content:  *input.Content,
-	}
+	panic("not implemented")
+	// if !*db.Connecting {
+	// 	panic("db not connect")
+	// }
+	// iData := db.Product{
+	// 	Title:    *input.Title,
+	// 	Price:    *input.Price,
+	// 	Discount: *input.Discount,
+	// 	Code:     *input.Code,
+	// 	Content:  *input.Content,
+	// }
 
-	result, err := db.CreateProduct(&iData)
-	if err != nil {
-		return nil, err
-	}
-	id := result.ID.Hex()
-	oData := models.Product{
-		ID:       &id,
-		Title:    &result.Title,
-		Price:    &result.Price,
-		Discount: &result.Discount,
-		Code:     &result.Code,
-		Content:  &result.Content,
-	}
-	return &oData, nil
+	// result, err := db.CreateProduct(&iData)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// id := result.ID.Hex()
+	// oData := models.Product{
+	// 	ID:       &id,
+	// 	Title:    &result.Title,
+	// 	Price:    &result.Price,
+	// 	Discount: &result.Discount,
+	// 	Code:     &result.Code,
+	// 	Content:  &result.Content,
+	// }
+	// return &oData, nil
 }
 
 func (r *mutationResolver) Updateproduct(ctx context.Context, input models.ProductInput, productID string) (*models.Product, error) {
@@ -46,26 +52,30 @@ func (r *mutationResolver) Deleteproduct(ctx context.Context, productID string) 
 }
 
 func (r *queryResolver) Products(ctx context.Context) ([]*models.Product, error) {
-	result, err := db.ReadproductAll()
-	if err != nil {
-		return nil, err
-	}
-	oData := []*models.Product{}
+	panic("not implemented")
+	// if !*db.Connecting {
+	// 	panic("db not connect")
+	// }
+	// result, err := db.ReadproductAll()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// oData := []*models.Product{}
 
-	for _, v := range result {
-		id := v.ID.Hex()
-		oObj := models.Product{
-			ID:       &id,
-			Title:    &v.Title,
-			Price:    &v.Price,
-			Code:     &v.Code,
-			Discount: &v.Discount,
-			Content:  &v.Content,
-		}
-		oData = append(oData, &oObj)
-	}
+	// for _, v := range result {
+	// 	id := v.ID.Hex()
+	// 	oObj := models.Product{
+	// 		ID:       &id,
+	// 		Title:    &v.Title,
+	// 		Price:    &v.Price,
+	// 		Code:     &v.Code,
+	// 		Discount: &v.Discount,
+	// 		Content:  &v.Content,
+	// 	}
+	// 	oData = append(oData, &oObj)
+	// }
 
-	return oData, nil
+	// return oData, nil
 }
 
 func (r *queryResolver) Productwithid(ctx context.Context, productID string) (*models.Product, error) {

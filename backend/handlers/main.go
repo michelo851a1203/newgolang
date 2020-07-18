@@ -15,7 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// import "github.com/99designs/gqlgen/handler"
+// // import "github.com/99designs/gqlgen/handler"
 func gqlhandler() gin.HandlerFunc {
 	c := gql.Config{
 		Resolvers: &resolvers.Resolver{},

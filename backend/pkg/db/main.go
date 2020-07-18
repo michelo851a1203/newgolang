@@ -9,7 +9,15 @@ import (
 var db *mgo.Database
 var cname string = "product"
 
+//Connecting <>
+var Connecting *bool
+
 func init() {
+	Connecting = CheckifConnect()
+	if !*Connecting {
+		log.Fatal("not connect ")
+		return
+	}
 	mgoInfo := &mgo.DialInfo{
 		Addrs:    []string{"localhost:27017"},
 		Database: "shop",
@@ -19,8 +27,23 @@ func init() {
 	session, err := mgo.DialWithInfo(mgoInfo)
 	if err != nil {
 		log.Fatalf("db error %s", err)
+		panic(err)
 	}
 	db = session.DB("shop")
+}
+
+// CheckifConnect <>
+func CheckifConnect() *bool {
+	mgoInfo := &mgo.DialInfo{
+		Addrs:    []string{"localhost:27017"},
+		Database: "shop",
+		Username: "michael",
+		Password: "lneequal1",
+	}
+	session, err := mgo.DialWithInfo(mgoInfo)
+	defer session.Close()
+	result := err == nil
+	return &result
 }
 
 // CreateProduct <this is a special case in this application>

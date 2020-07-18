@@ -1,8 +1,6 @@
 package main
 
-import (
-	"testapp/handlers"
-)
+import "testapp/handlers"
 
 func main() {
 	handlers.Run()
