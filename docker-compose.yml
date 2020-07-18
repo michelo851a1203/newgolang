@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+    db:
+        build: "./db"
+        image: "michelo851a1203/db"
+        ports:
+            - "27017:27017"
+        networks:
+            backendnetwork:
+        volume:
+            dbvolume:
+    backend:
+        build:
+            context: "./backend"
+        image: "michelo851a1203/backend"
+        ports:
+            - "8080:8080"
+        networks:
+            backendnetwork:
+    forntend:
+        build:
+            context: "./frontend"
+        image: "michelo851a1203/frontend"
+        ports: 
+            - "8080:8080"
+        networks:
+            frontnetwork:
+networks:
+    backendnetwork: 
+    frontnetwork: 
+volumes:
+    dbvolume:

@@ -7,6 +7,7 @@ import (
 )
 
 var db *mgo.Database
+var cname string = "product"
 
 func init() {
 	mgoInfo := &mgo.DialInfo{
@@ -22,33 +23,54 @@ func init() {
 	db = session.DB("shop")
 }
 
-// Create <>
-func Create(collection string, data *interface{}) (*interface{}, error) {
-	C := db.C(collection)
-	err := C.Insert(&data)
+// CreateProduct <this is a special case in this application>
+func CreateProduct(inserData *Product) (*Product, error) {
+	C := db.C(cname)
+	err := C.Insert(&inserData)
 	if err != nil {
 		return nil, err
 	}
-	return data, nil
+	return inserData, nil
 }
 
-// ReadAll <>
-func ReadAll(collection string) ([]interface{}, error) {
-	C := db.C(collection)
-	var result []interface{}
-	err := C.Find(nil).All(&result)
+// ReadproductAll <>
+func ReadproductAll() ([]Product, error) {
+	entry := []Product{}
+	C := db.C(cname)
+	err := C.Find(nil).All(&entry)
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return entry, nil
 }
 
-// UpdateWithID <>
-func UpdateWithID(collection, id string, updateData interface{}) (interface{}, error) {
-	C := db.C(collection)
-	err := C.UpdateId(id, &updateData)
-	if err != nil {
-		return nil, err
-	}
-	return updateData, nil
-}
+// // Create <>
+// func create(collection string, data *interface{}) (*interface{}, error) {
+// 	C := db.C(collection)
+// 	err := C.Insert(&data)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return data, nil
+// }
+
+// // ReadAll <>
+// func readAll(collection string) ([]interface{}, error) {
+// 	C := db.C(collection)
+// 	var result []interface{}
+// 	err := C.Find(nil).All(&result)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return result, nil
+// }
+
+// // UpdateWithID <>
+// func updateWithID(collection, id string, updateData interface{}) (interface{}, error) {
+// 	C := db.C(collection)
+// 	err := C.UpdateId(id, &updateData)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return updateData, nil
+// }
