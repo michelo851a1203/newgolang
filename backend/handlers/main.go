@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	db "testapp/pkg/db"
 	"testapp/pkg/gql"
 	"testapp/pkg/gql/resolvers"
 	"time"
@@ -15,7 +16,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// // import "github.com/99designs/gqlgen/handler"
 func gqlhandler() gin.HandlerFunc {
 	c := gql.Config{
 		Resolvers: &resolvers.Resolver{},
@@ -35,6 +35,8 @@ func backgroundhandlers(path string) gin.HandlerFunc {
 
 // Run <>
 func Run() {
+	db.ConnectDB()
+	db.Insertprocess()
 	r := gin.Default()
 	r.GET("/", backgroundhandlers("/graphql"))
 	r.POST("/graphql", gqlhandler())

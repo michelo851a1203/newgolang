@@ -1,23 +1,24 @@
 package dbs
 
+// TODO:https://studygolang.com/articles/14152 研究一下這個問題解法
 import (
 	"log"
 
 	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 )
 
-var db *mgo.Database
-var cname string = "product"
+// InsertInChan <>
+var InsertInChan chan Product
 
-//Connecting <>
-var Connecting *bool
+// InsertOutChan <>
+var InsertOutChan chan Product
 
-func init() {
-	Connecting = CheckifConnect()
-	if !*Connecting {
-		log.Fatal("not connect ")
-		return
-	}
+// ShopDB <>
+var shop *mgo.Database
+
+// ConnectDB <>
+func ConnectDB() {
 	mgoInfo := &mgo.DialInfo{
 		Addrs:    []string{"localhost:27017"},
 		Database: "shop",
@@ -26,74 +27,52 @@ func init() {
 	}
 	session, err := mgo.DialWithInfo(mgoInfo)
 	if err != nil {
-		log.Fatalf("db error %s", err)
-		panic(err)
+		log.Fatalf("db error : %s", err)
+		panic("db connect error")
 	}
-	db = session.DB("shop")
+	shop = session.DB("shop")
 }
 
-// CheckifConnect <>
-func CheckifConnect() *bool {
-	mgoInfo := &mgo.DialInfo{
-		Addrs:    []string{"localhost:27017"},
-		Database: "shop",
-		Username: "michael",
-		Password: "lneequal1",
+func getCollection(name string) *mgo.Collection {
+	if shop != nil {
+		return shop.C(name)
 	}
-	session, err := mgo.DialWithInfo(mgoInfo)
-	defer session.Close()
-	result := err == nil
-	return &result
+	return nil
 }
 
-// CreateProduct <this is a special case in this application>
-func CreateProduct(inserData *Product) (*Product, error) {
-	C := db.C(cname)
-	err := C.Insert(&inserData)
-	if err != nil {
-		return nil, err
-	}
-	return inserData, nil
+// SetinsertInChan <>
+func SetinsertInChan(data Product) {
+	InsertInChan <- data
 }
 
-// ReadproductAll <>
-func ReadproductAll() ([]Product, error) {
-	entry := []Product{}
-	C := db.C(cname)
-	err := C.Find(nil).All(&entry)
-	if err != nil {
-		return nil, err
-	}
-	return entry, nil
+// GetinsertOutChan <>
+func GetinsertOutChan() <-chan Product {
+	return InsertOutChan
 }
 
-// // Create <>
-// func create(collection string, data *interface{}) (*interface{}, error) {
-// 	C := db.C(collection)
-// 	err := C.Insert(&data)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return data, nil
-// }
-
-// // ReadAll <>
-// func readAll(collection string) ([]interface{}, error) {
-// 	C := db.C(collection)
-// 	var result []interface{}
-// 	err := C.Find(nil).All(&result)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return result, nil
-// }
-
-// // UpdateWithID <>
-// func updateWithID(collection, id string, updateData interface{}) (interface{}, error) {
-// 	C := db.C(collection)
-// 	err := C.UpdateId(id, &updateData)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return updateData, nil
-// }
+// Insertprocess <>
+func Insertprocess() {
+	go func(in *chan Product) {
+		for {
+			select {
+			case input := <-*in:
+				C := getCollection("product")
+				if C == nil {
+					panic("db process error")
+				}
+				err := C.Insert(&input)
+				if err != nil {
+					log.Fatalf("insert error %s", err)
+					panic("insert error")
+				}
+				oData := Product{}
+				err = C.Find(bson.M{"title": input.Title}).One(&oData)
+				if err != nil {
+					log.Fatalf("insert return error %v", err)
+					panic("insert return error")
+				}
+				InsertOutChan <- oData
+			}
+		}
+	}(&InsertInChan)
+}

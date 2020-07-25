@@ -4,21 +4,33 @@ package resolvers
 
 import (
 	"context"
+	"log"
+	"sync"
+	db "testapp/pkg/db"
 	gql "testapp/pkg/gql"
 	models "testapp/pkg/gql/models"
+
+	"github.com/globalsign/mgo"
 )
 
 // Resolver <>
-type Resolver struct{}
+type Resolver struct {
+}
 
-// TODO: this mongodb application cause error and stuck here if db not exist
-// okay we find the problem
-// TODO: docker-compose not show any !(okay find the probelm is the same as mongodb problem)
 func (r *mutationResolver) Createproduct(ctx context.Context, input models.ProductInput) (*models.Product, error) {
-	panic("not implemented")
-	// if !*db.Connecting {
-	// 	panic("db not connect")
+	// mgoInfo := &mgo.DialInfo{
+	// 	Addrs:    []string{"localhost:27017"},
+	// 	Database: "shop",
+	// 	Username: "michael",
+	// 	Password: "lneequal1",
 	// }
+	// session, err := mgo.DialWithInfo(mgoInfo)
+	// defer session.Close()
+	// if err != nil {
+	// 	log.Fatalf("this is error : %v", err)
+	// 	return nil, err
+	// }
+
 	// iData := db.Product{
 	// 	Title:    *input.Title,
 	// 	Price:    *input.Price,
@@ -26,21 +38,62 @@ func (r *mutationResolver) Createproduct(ctx context.Context, input models.Produ
 	// 	Code:     *input.Code,
 	// 	Content:  *input.Content,
 	// }
-
-	// result, err := db.CreateProduct(&iData)
+	// database := session.DB("shop")
+	// C := database.C("product")
+	// err = C.Insert(&iData)
 	// if err != nil {
+	// 	log.Fatalf("this is error : %v", err)
 	// 	return nil, err
 	// }
-	// id := result.ID.Hex()
+
+	// dboData := db.Product{}
+	// err = C.Find(bson.M{"title": input.Title}).One(&dboData)
+	// if err != nil {
+	// 	log.Fatalf("this is error : %v", err)
+	// 	return nil, err
+	// }
+	// id := dboData.ID.Hex()
 	// oData := models.Product{
 	// 	ID:       &id,
-	// 	Title:    &result.Title,
-	// 	Price:    &result.Price,
-	// 	Discount: &result.Discount,
-	// 	Code:     &result.Code,
-	// 	Content:  &result.Content,
+	// 	Title:    &dboData.Title,
+	// 	Price:    &dboData.Price,
+	// 	Discount: &dboData.Discount,
+	// 	Code:     &dboData.Code,
+	// 	Content:  &dboData.Content,
+	// 	Avator:   &dboData.Avator,
 	// }
-	// return &oData, nil
+	var oData models.Product
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	// okay here to read input chan
+	go func(wg *sync.WaitGroup) {
+		insData := db.Product{
+			Title:    *input.Title,
+			Price:    *input.Price,
+			Discount: *input.Discount,
+			Code:     *input.Code,
+			Content:  *input.Content,
+		}
+		db.SetinsertInChan(insData)
+		for {
+			select {
+			case result := <-db.GetinsertOutChan():
+				id := result.ID.Hex()
+				oData = models.Product{
+					ID:       &id,
+					Title:    &result.Title,
+					Price:    &result.Price,
+					Discount: &result.Discount,
+					Code:     &result.Code,
+					Content:  &result.Content,
+					Avator:   &result.Avator,
+				}
+				wg.Done()
+			}
+		}
+	}(&wg)
+	wg.Wait()
+	return &oData, nil
 }
 
 func (r *mutationResolver) Updateproduct(ctx context.Context, input models.ProductInput, productID string) (*models.Product, error) {
@@ -52,30 +105,41 @@ func (r *mutationResolver) Deleteproduct(ctx context.Context, productID string) 
 }
 
 func (r *queryResolver) Products(ctx context.Context) ([]*models.Product, error) {
-	panic("not implemented")
-	// if !*db.Connecting {
-	// 	panic("db not connect")
-	// }
-	// result, err := db.ReadproductAll()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// oData := []*models.Product{}
-
-	// for _, v := range result {
-	// 	id := v.ID.Hex()
-	// 	oObj := models.Product{
-	// 		ID:       &id,
-	// 		Title:    &v.Title,
-	// 		Price:    &v.Price,
-	// 		Code:     &v.Code,
-	// 		Discount: &v.Discount,
-	// 		Content:  &v.Content,
-	// 	}
-	// 	oData = append(oData, &oObj)
-	// }
-
-	// return oData, nil
+	mgoInfo := &mgo.DialInfo{
+		Addrs:    []string{"localhost:27017"},
+		Database: "shop",
+		Username: "michael",
+		Password: "lneequal1",
+	}
+	session, err := mgo.DialWithInfo(mgoInfo)
+	defer session.Close()
+	if err != nil {
+		log.Fatalf("this is error : %v", err)
+		return nil, err
+	}
+	database := session.DB("shop")
+	C := database.C("product")
+	entry := []db.Product{}
+	err = C.Find(nil).All(&entry)
+	if err != nil {
+		log.Fatalf("this is error : %v", err)
+		return nil, err
+	}
+	oData := []*models.Product{}
+	for _, v := range entry {
+		id := v.ID.Hex()
+		tmp := models.Product{
+			ID:       &id,
+			Title:    &v.Title,
+			Price:    &v.Price,
+			Discount: &v.Discount,
+			Code:     &v.Code,
+			Content:  &v.Content,
+			Avator:   &v.Avator,
+		}
+		oData = append(oData, &tmp)
+	}
+	return oData, nil
 }
 
 func (r *queryResolver) Productwithid(ctx context.Context, productID string) (*models.Product, error) {
